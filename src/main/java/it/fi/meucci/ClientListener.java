@@ -26,7 +26,7 @@ public class ClientListener extends Thread {
 
             Client.textArea.append(stringaRicevutaDalServer + "\n");
 
-            if (stringaRicevutaDalServer.charAt(0) == '$' && stringaRicevutaDalServer.charAt(1) == 'e') {
+            if (stringaRicevutaDalServer.charAt(0) == '#' && stringaRicevutaDalServer.charAt(1) == 'c') {
                 System.out.println("Disconnessione...");
                 break;
             }

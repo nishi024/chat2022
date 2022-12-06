@@ -49,7 +49,7 @@ public class ServerThread extends Thread {
                     System.out.println("Aggiunto utente: " + nomeUtente);
                 }
 
-            } else if(stringaRicevuta.charAt(0) == '$' && stringaRicevuta.charAt(1) == 'b'){ //TIPS: LE "text" VENGONO USATE PER LA STRINGA MENTRE 'text' PER LE CHAR
+            } else if(stringaRicevuta.charAt(0) == '#' && stringaRicevuta.charAt(1) == 'p'){ //TIPS: LE "text" VENGONO USATE PER LA STRINGA MENTRE 'text' PER LE CHAR
                 //confermo la selezione del PUBBLIC e chiedo al client il messaggio da inviare a tutti
                 outVersoClient.writeBytes("Selezionato messaggio Pubblico, inserire messaggio" + '\n'); 
                 stringaRicevuta = inDalClient.readLine(); //aspetto l'invio del messaggio
@@ -58,16 +58,7 @@ public class ServerThread extends Thread {
                 // outVersoClient.writeBytes("Messaggio inviato correttamente." + '\n');
                 System.out.println("SERVER DICE: HO APPENA INVIATO A TUTTI UN MESSAGGIO");
 
-            } else if(stringaRicevuta.charAt(0) == '$' && stringaRicevuta.charAt(1) == 'v'){
-                outVersoClient.writeBytes("Selezionato messaggio Privato, inserire destinatario" + '\n'); //confermo la selezione del PRIVATE e chiedo al client il destinatario
-                stringaRicevuta = inDalClient.readLine(); //aspetto l'invio del nome del destinatario
-                destinatario = stringaRicevuta; //salvo il nome del destinatario in una variabile
-                outVersoClient.writeBytes("Selezionato destinatario " + destinatario + ", inserire messaggio" + '\n'); //adesso richiedo il messaggio da inviare al destinatario
-                stringaRicevuta = inDalClient.readLine(); //aspetto l'invio del messaggio
-                serverListener.sendOne(stringaRicevuta, nomeUtente, destinatario);
-                System.out.println("SERVER DICE: HO APPENA INVIATO A " + destinatario + " UN MESSAGGIO");
-
-            }else if(stringaRicevuta.charAt(0) == '$' && stringaRicevuta.charAt(1) == 'e'){ //faccio uscire dalla chat l'utente
+            } else if(stringaRicevuta.charAt(0) == '#' && stringaRicevuta.charAt(1) == 'c'){ //faccio uscire dalla chat l'utente
                 serverListener.remove(nomeUtente);
                 break;
             } else {

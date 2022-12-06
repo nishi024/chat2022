@@ -7,7 +7,7 @@ public class Server {
     public void start() {
         try {
             ServerSocket serverSocket = new ServerSocket(6789);
-            System.out.println("il server è partito");
+            System.out.println("il server è in esecuzione");
             ServerListener hashMap = new ServerListener();
 
             for (;;) {

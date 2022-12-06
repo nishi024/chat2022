@@ -23,7 +23,7 @@ public class Client implements ActionListener, KeyListener {
     JFrame frame2;
     JPanel panel1;
     JPanel panel2;
-    JLabel labelNomeUtente;
+    JLabel NomeUtente;
     JLabel errore;
     JTextField textField;
     JTextField tfMessaggio;
@@ -31,13 +31,13 @@ public class Client implements ActionListener, KeyListener {
     JButton buttonInserisci;
     JButton buttonInvia;
 
-    public void inserimentoNomeUtente() {
+public void inserimentoNomeUtente() {
         frame1 = new JFrame();
 
-        labelNomeUtente = new JLabel("Inserire nome utente");
-        labelNomeUtente.setBounds(230, 130, 400, 30);
-        labelNomeUtente.setFont(new Font("Itim", Font.BOLD, 18));
-        labelNomeUtente.setForeground(Color.decode("#EEEEEE"));
+        NomeUtente = new JLabel("Inserisci il nome");
+        NomeUtente.setBounds(230, 130, 400, 30);
+        NomeUtente.setFont(new Font("Itim", Font.BOLD, 18));
+        NomeUtente.setForeground(Color.decode("#EEEEEE"));
 
         textField = new JTextField();
         textField.setBounds(240, 170, 160, 25);
@@ -59,14 +59,14 @@ public class Client implements ActionListener, KeyListener {
         panel1.setLayout(null);
         panel1.setPreferredSize(new Dimension(640, 360));
         panel1.setBackground(Color.decode("#222831"));
-        panel1.add(labelNomeUtente);
+        panel1.add(NomeUtente);
         panel1.add(textField);
         panel1.add(buttonInserisci);
         panel1.add(errore);
 
         frame1.add(panel1);
         frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame1.setTitle("siChiacchera");
+        frame1.setTitle("chat");
         frame1.setResizable(false);
         frame1.pack();
         frame1.setLocationRelativeTo(null);
@@ -83,11 +83,9 @@ public class Client implements ActionListener, KeyListener {
         textArea.setForeground(Color.decode("#EEEEEE"));
         textArea.setEditable(false);
         textArea.append(
-                "Ti sei unito alla chat\nComandi:\n$b - Messaggio pubblico\n$v - Messaggio privato\n$e - Abbandona chat\n\n");
+                "sei unito alla chat\nComandi:\n#p - Messaggio pubblico\n#chiudi - Abbandona chat\n\n");
 
-        // per rendere la textArea scrollabile (NON FUNZIONA)
-        JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    
 
         tfMessaggio = new JTextField();
         tfMessaggio.setBounds(10, 445, 744, 25);
@@ -108,11 +106,10 @@ public class Client implements ActionListener, KeyListener {
         panel2.add(buttonInvia);
         panel2.add(textArea);
         panel2.add(tfMessaggio);
-        panel2.add(scroll);
 
         frame2.add(panel2);
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame2.setTitle("siChiacchera | Utente: " + nomeUtente);
+        frame2.setTitle("chat : " + nomeUtente);
         frame2.setResizable(false);
         frame2.pack();
         frame2.setLocationRelativeTo(null);
@@ -120,9 +117,7 @@ public class Client implements ActionListener, KeyListener {
 
         listener.start();
 
-        // non funziona
-        // textArea.setText(serverListener.stampaUtentiConnessi());
-        // System.out.println(serverListener.stampaUtentiConnessi());
+  
     }
 
     public Socket connetti() {
@@ -150,38 +145,35 @@ public class Client implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        // controllo se viene premuto il pulsante per l'inserimento del nome utente
-        if (e.getSource().equals(buttonInserisci)) {
+       
+        if (e.getSource().equals(buttonInserisci)) { // controllo se viene premuto il pulsante per l'inserimento del nome utente
             nomeUtente = textField.getText();
 
             try {
-                // controllo che il nome non sia già stato inserito (NON FUNZIONA)
-                if (!serverListener.verify(nomeUtente)) {
+                
+                if (!serverListener.verify(nomeUtente)) {//controllo nomi uguali
                     errore.setText("Nome utente gia' inserito");
                     errore.setLocation(250, 250);
-                } else if (nomeUtente.contains(" ")) {
-                    errore.setText("Il nome utente non puo' contenere spazi");
-                    errore.setLocation(205, 250);
                 } else if (nomeUtente.equals("")) {
-                    errore.setText("Inserire un nome utente");
+                    errore.setText("non hai inserito il nome utente");
                     errore.setLocation(250, 250);
                 } else {
                     outVersoServer.writeBytes("/" + nomeUtente + '\n');
 
-                    // Chiudo la finestra per l'inserimento del nome utente
-                    frame1.dispose();
-                    // apro la finestra della chat
-                    chatGUI();
+                   
+                    frame1.dispose(); // Chiudo la finestra per l'inserimento del nome utente
+                    
+                    chatGUI();// apro la finestra della chat
                 }
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
 
-        } else { // controllo se viene premuto il pulsante per l'invio dei messaggi
-            String messaggio = tfMessaggio.getText();
+        } else { 
+            String messaggio = tfMessaggio.getText();//bottone invio messaggi
             tfMessaggio.setText("");
 
-            if (messaggio.charAt(0) != '$') {
+            if (messaggio.charAt(0) != '#') {
                 textArea.append(nomeUtente + ": " + messaggio + "\n");
             }
 
@@ -193,8 +185,8 @@ public class Client implements ActionListener, KeyListener {
                 }
             }
 
-            // chiusura della chat se viene mandato il messaggio "$e"
-            if (messaggio.equals("$e")) {
+            
+            if (messaggio.equals("#chiudi")) {// chat viene chiusa con il comando"#chiudi"
                 frame2.dispose();
             }
         }

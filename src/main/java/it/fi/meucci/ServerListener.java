@@ -34,13 +34,7 @@ public class ServerListener {
         }
     }
 
-    public void sendOne(String messaggio, String mittente, String destinatario) throws Exception {
-        for (String x : handler.keySet()) {
-            if (x.equals(destinatario)) {
-                handler.get(x).messaggia(mittente + " (in privato): " + messaggio);
-            }
-        }
-    }
+
 
     public void remove(String nome) throws Exception {
         handler.remove(nome);

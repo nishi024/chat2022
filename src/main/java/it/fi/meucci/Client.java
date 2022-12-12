@@ -2,76 +2,94 @@ package it.fi.meucci;
 
 import java.io.*;
 import java.net.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-public class ServerThread extends Thread {
-    ServerSocket server = null;
-    ServerListener serverListener;
-    Socket client = null;
-    String stringaRicevuta = null;
-    BufferedReader inDalClient;
-    DataOutputStream outVersoClient;
-    String nomeUtente = null;
-    String destinatario;
-    Client chat = new Client();
+public class Client implements ActionListener, KeyListener {
+    String nomeServer = "localhost";
+    int portaServer = 6789;
+    Socket miosocket;
+    BufferedReader tastiera;
+    String stringaUtente;
+    String stringaRicevutaDalServer;
+    String nomeUtente;
+    DataOutputStream outVersoServer;
+    ClientListener listener;
+    ServerListener serverListener = new ServerListener();
 
-    public ServerThread(Socket socket, ServerSocket server, ServerListener writer1) throws Exception{
-        this.client = socket;
-        this.server = server;
-        this.serverListener = writer1;
-        inDalClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        outVersoClient = new DataOutputStream(client.getOutputStream());
-    }
 
-    public void run() {
+
+    public Socket connetti() {
+        System.out.println("Ingresso nella chat");
         try {
-            comunica();
+
+            tastiera = new BufferedReader(new InputStreamReader(System.in));
+
+            miosocket = new Socket(nomeServer, portaServer);
+
+            outVersoServer = new DataOutputStream(miosocket.getOutputStream());
+
+            listener = new ClientListener(miosocket);
+
+        } catch (UnknownHostException e) {
+            System.err.println("Host sconosciuto");
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            System.out.println(e.getMessage());
+            System.out.println("Errore durante la connessione");
+            System.exit(1);
         }
+        return miosocket;
     }
 
-    public void comunica() throws Exception{
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
-        for (;;) {
-            //leggo la stringa inviata dal client
-            stringaRicevuta = inDalClient.readLine(); 
+       
+        if (e.getSource().equals(buttonInserisci)) { // controllo se viene premuto il pulsante per l'inserimento del nome utente
+            nomeUtente = textField.getText();
 
-            // controllo che sia un nome utente (viene aggiunto un '/' all'inizio del nomeUtente)
-            if (stringaRicevuta.charAt(0) == '/') { 
+ else { 
+            String messaggio = tfMessaggio.getText();//bottone invio messaggi
+            tfMessaggio.setText("");
 
-                // rimuovo il primo carattere della stringa
-                stringaRicevuta = stringaRicevuta.substring(1);
+            if (messaggio.charAt(0) != '#') {
+                textArea.append(nomeUtente + ": " + messaggio + "\n");
+            }
 
-                //se il controllo va a buon fine allora il client entra nella chat, senno darà errore e richiederà l'inserimento dei dati
-                if(serverListener.verify(stringaRicevuta)){ 
-                    nomeUtente = stringaRicevuta;
-                    serverListener.aggiungiSocket(nomeUtente, this); // this fa passare il ServerThread corrente
-                    System.out.println("Aggiunto utente: " + nomeUtente);
+            if (!messaggio.isEmpty()) {
+                try {
+                    outVersoServer.writeBytes(messaggio + '\n');
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
+            }
 
-            } else if(stringaRicevuta.charAt(0) == '#' && stringaRicevuta.charAt(1) == 'p'){ //TIPS: LE "text" VENGONO USATE PER LA STRINGA MENTRE 'text' PER LE CHAR
-                //confermo la selezione del PUBBLIC e chiedo al client il messaggio da inviare a tutti
-                outVersoClient.writeBytes("Selezionato messaggio Pubblico, inserire messaggio" + '\n'); 
-                stringaRicevuta = inDalClient.readLine(); //aspetto l'invio del messaggio
-                //funzione del thread writer che esegue l'invio del messaggio a tutti i client connessi
-                serverListener.sendAll(stringaRicevuta, nomeUtente); 
-                // outVersoClient.writeBytes("Messaggio inviato correttamente." + '\n');
-                System.out.println("SERVER DICE: HO APPENA INVIATO A TUTTI UN MESSAGGIO");
-
-            } else if(stringaRicevuta.charAt(0) == '#' && stringaRicevuta.charAt(1) == 'c'){ //faccio uscire dalla chat l'utente
-                serverListener.remove(nomeUtente);
-                break;
-            } else {
-                outVersoClient.writeBytes("Comando non valido" + '\n');
+            
+            if (messaggio.equals("#chiudi")) {// chat viene chiusa con il comando"#chiudi"
+                frame2.dispose();
             }
         }
-        outVersoClient.close();
-        inDalClient.close();
-        System.out.println("Chiusura socket: " + client);
-        client.close();
+
     }
 
-    public void messaggia(String messaggio) throws Exception{
-        outVersoClient.writeBytes(messaggio + "\n");
+    // metodi  dall'implementazione KeyListener
+    @Override
+    public void keyTyped(KeyEvent e) {
     }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.connetti();
+        client.inserimentoNomeUtente();
+    }
+
 }

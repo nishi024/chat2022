@@ -37,7 +37,7 @@
     <configuration>
       <archive>
         <manifest>
-          <mainClass>package.nomeclasse</mainClass>
+          <mainClass>it.fi.meucci</mainClass>
         </manifest>
       </archive> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs>
      </configuration> 
